@@ -13,15 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('recipient_codes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('transaction_pin');
-            $table->rememberToken();
+            $table->unsignedBigInteger('user_bank_detail_id');
+            $table->string('code');
+            $table->string('provider');
             $table->timestamps();
+
+            $table->foreign('user_bank_detail_id')->references('id')->on('user_bank_details')->onDelete('cascade');
         });
     }
 
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('recipient_codes');
     }
 };

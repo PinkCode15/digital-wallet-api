@@ -1,6 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\WalletController;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +17,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('v1')->group(function () {
+    Route::post('/login', [LoginController::class, 'login']);
+
+    Route::group(['prefix' => 'wallets', 'middleware' => ['auth:sanctum']], function () {
+        Route::get('', [WalletController::class, 'getUserWallets']);
+        Route::post('/deposit', [WalletController::class, 'initiateDeposit']);
+        Route::post('/withdraw', [WalletController::class, 'initiateWithdraw']);
+    });
+
+    Route::get('/transactions', [TransactionController::class, 'getUserTransactions'])->middleware(['auth:sanctum']);
+    Route::post('/webhooks/{provider}', [WalletController::class, 'processWebhook']);   
 });
+
+
