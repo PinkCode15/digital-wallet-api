@@ -46,7 +46,7 @@ class InitiateWithdrawAction
             }
 
             $data = [
-                'reference' => $response['reference'],
+                'reference' => $reference,
                 'amount' => $response['amount'],
                 'currency' => $data['wallet']->currency
             ];

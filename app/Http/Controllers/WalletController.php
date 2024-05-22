@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Wallet\DepositAction;
 use App\Actions\Wallet\InitiateDepositAction;
 use App\Actions\Wallet\InitiateWithdrawAction;
 use App\Actions\Wallet\ProcessDepositWebhookAction;
-use App\Actions\Wallet\ProcessWebhookAction;
 use App\Actions\Wallet\ProcessWithdrawWebhookAction;
-use App\Actions\Wallet\WIthdrawAction;
 use App\Http\Requests\Wallet\DepositRequest;
 use App\Http\Requests\Wallet\InitiateDepositRequest;
 use App\Http\Requests\Wallet\InitiateWithdrawRequest;
@@ -35,15 +32,82 @@ class WalletController extends Controller
         
         try{
             return response()->json([
-                'message' => 'Wallet(s) Retrieved Successful',
+                'message' => 'Wallet(s) Retrieved Successfully',
                 'data' => [
-                    'wallets' => $user->wallets
+                    'wallets' => $user->wallets()->paginate($request->length ?? 20)
                 ]
             ], 200); 
         } catch (Exception $e) {
             Log::error($e);
 
             return response()->json(['error' => 'Failed to retrieve wallet(s)'], 500);
+        }
+    }
+
+    /**
+     * Retrieve wallet.
+     *
+     * @param string $walletIdentifier
+     * @return JsonResponse
+     */
+    public function getWallet(string $walletIdentifier): JsonResponse
+    {
+        $user = Auth::user();
+        
+        try{
+            $wallet = Wallet::where('uuid', $walletIdentifier)->first();
+
+            if($wallet->user_id !== $user->id){
+                return response()->json([
+                    'message' => 'Wallet does not belong to user',
+                    'data' => []
+                ], 403); 
+            }
+
+            return response()->json([
+                'message' => 'Wallet Retrieved Successfully',
+                'data' => [
+                    'wallet' => $wallet
+                ]
+            ], 200); 
+        } catch (Exception $e) {
+            Log::error($e);
+
+            return response()->json(['error' => 'Failed to retrieve wallet'], 500);
+        }
+    }
+
+    /**
+     * Retrieve wallet transactions.
+     *
+     * @param Request $request
+     * @param string $walletIdentifier
+     * @return JsonResponse
+     */
+    public function getWalletTransactions(Request $request, string $walletIdentifier): JsonResponse
+    {
+        $user = Auth::user();
+        
+        try{
+            $wallet = Wallet::where('uuid', $walletIdentifier)->first();
+
+            if($wallet->user_id !== $user->id){
+                return response()->json([
+                    'message' => 'Wallet does not belong to user',
+                    'data' => []
+                ], 403); 
+            }
+
+            return response()->json([
+                'message' => 'Wallet Transaction(s) Retrieved Successfully',
+                'data' => [
+                    'wallet' => $wallet->transactions()->orderBy('created_at', 'desc')->paginate($request->length ?? 20)
+                ]
+            ], 200); 
+        } catch (Exception $e) {
+            Log::error($e);
+
+            return response()->json(['error' => 'Failed to retrieve wallet transaction(s)'], 500);
         }
     }
 

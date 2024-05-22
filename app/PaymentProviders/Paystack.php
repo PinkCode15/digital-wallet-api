@@ -111,25 +111,6 @@ class Paystack
             $url, $requestData
         )->object();
 
-        $response = json_decode(json_encode([
-            "status" => true,
-            "message" => "Transfer requires OTP to continue",
-            "data" => [
-              "integration" => 100073,
-              "domain" => "test",
-              "amount" => $data['amount'] * 100,
-              "currency" => "NGN",
-              "source" => "balance",
-              "reason" => "Calm down",
-              "recipient" => 28,
-              "status" => "otp",
-              "transfer_code" => $data['reference'],
-              "id" => 14,
-              "createdAt" => "2017-02-03T17:21:54.508Z",
-              "updatedAt" => "2017-02-03T17:21:54.508Z"
-            ] 
-        ]));
-
         if($response->status !== true){
             Log::debug("Paystack Error - " . json_encode($response));
 
@@ -188,26 +169,6 @@ class Paystack
             $url
         )->object();
 
-        $response = json_decode(json_encode([
-            "status" => true,
-            "message" => "Verification successful",
-            "data" => [
-                "id" => 3813298261,
-                "domain" => "test",
-                "status" => "success",
-                "reference" => "TRF-BMP-20240521201136-0PAKLZ",
-                "receipt_number" => null,
-                "amount" => 1000,
-                "message" => null,
-                "gateway_response" => "Successful",
-                "paid_at" => "2024-05-21T13:13:01.000Z",
-                "created_at" => "2024-05-21T13:12:45.000Z",
-                "channel" => "card",
-                "currency" => "NGN",
-                "ip_address" => "41.217.97.81"
-            ]
-        ]));
-
         if($response->status !== true && isset($response->code) && $response->code !== "transaction_not_found"){
             return PaymentProvider::verifyWithdrawResponse(
                 'failed', $reference
@@ -235,8 +196,6 @@ class Paystack
     public function validateWebhook(Request $request): array
     {   
         $data = json_encode(json_decode($request->getContent()));
-
-        // dd(hash_hmac('sha512', $data, $this->secret_key));
 
         if($request->header('x-paystack-signature') !== hash_hmac('sha512', $data, $this->secret_key)) {
             $errorMessage = 'Failed to validate webhook';
@@ -291,8 +250,6 @@ class Paystack
         ])->post(
             $url, $requestData
         )->object();
-
-        logger(json_decode(json_encode($response), true));
 
         return $response;
     }

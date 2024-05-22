@@ -22,7 +22,7 @@ class TransactionController extends Controller
         
         try{
             return response()->json([
-                'message' => 'Transaction(s) Retrieved Successful',
+                'message' => 'Transaction(s) Retrieved Successfully',
                 'data' => [
                     'transactions' => $user->transactions()->orderBy('created_at', 'desc')->paginate($request->length ?? 20)
                 ]

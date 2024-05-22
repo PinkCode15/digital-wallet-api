@@ -36,7 +36,7 @@ class Wallet extends Model
      *
      * @return HasMany
      */
-    public function walletHistory()
+    public function walletHistories()
     {
         return $this->hasMany(WalletHistory::class);
     }
@@ -50,4 +50,15 @@ class Wallet extends Model
     {
         return $this->hasOne(UserBankDetail::class);
     }
+
+     /**
+     * returns wallet transactions
+     *
+     * @return HasMany
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
 }
