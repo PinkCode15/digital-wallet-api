@@ -8,7 +8,7 @@ wallet balances and transactions securely.
 
 
 ### Getting Started:
-- Clone the repository: git clone [<repository_url>](https://github.com/PinkCode15/digital-wallet-api.git)
+- Clone the repository: `git clone https://github.com/PinkCode15/digital-wallet-api.git`
 - Install dependencies: `composer install`
 - Copy the .env.example file and rename it to .env.
 - Generate application key: `php artisan key:generate`
@@ -23,6 +23,7 @@ wallet balances and transactions securely.
 
 ### Architecture Digram
 This diagram shows the wallet component and its integration with the payment service.
+https://excalidraw.com/#json=B3tYR8ljf3Winfe_oFDpQ,1_8rDus0Hts3eI1Rq50ncg
 
 
 ### Author
