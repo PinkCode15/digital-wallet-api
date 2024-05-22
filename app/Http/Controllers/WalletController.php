@@ -6,9 +6,11 @@ use App\Actions\Wallet\InitiateDepositAction;
 use App\Actions\Wallet\InitiateWithdrawAction;
 use App\Actions\Wallet\ProcessDepositWebhookAction;
 use App\Actions\Wallet\ProcessWithdrawWebhookAction;
+use App\Actions\Wallet\TransferFundsAction;
 use App\Http\Requests\Wallet\DepositRequest;
 use App\Http\Requests\Wallet\InitiateDepositRequest;
 use App\Http\Requests\Wallet\InitiateWithdrawRequest;
+use App\Http\Requests\Wallet\TransferFundsRequest;
 use App\Models\Transaction;
 use App\Models\Wallet;
 use Exception;
@@ -233,6 +235,48 @@ class WalletController extends Controller
             Log::error($e);
 
             return response()->json(['error' => 'Failed to process webhook'], 500);
+        }
+    }
+
+    /**
+     * Transfer funds between wallets.
+     *
+     * @param TransferFundsRequest $request
+     * @return JsonResponse
+     */
+    public function transferFunds(TransferFundsRequest $request): JsonResponse
+    {
+        $user = Auth::user();
+        
+        try{
+            $sourceWallet = Wallet::where('uuid', $request->source_wallet_identifier)->first();
+
+            if($sourceWallet->user_id !== $user->id){
+                return response()->json([
+                    'message' => 'Wallet does not belong to user',
+                    'data' => []
+                ], 403); 
+            }
+
+            if(!Hash::check($request->transaction_pin, $user->transaction_pin)){
+                return response()->json([
+                    'message' => 'Incorrect transaction pin',
+                    'data' => []
+                ], 403); 
+            }
+
+            $destinationWallet = Wallet::where('uuid', $request->destination_wallet_identifier)->first();
+
+            $data = (new TransferFundsAction())->execute($sourceWallet, $destinationWallet, $request->amount);
+
+            return response()->json([
+                'message' => 'Transfer funds successful',
+                'data' => [$data]
+            ], 200); 
+        } catch (Exception $e) {
+            Log::error($e);
+
+            return response()->json(['error' => 'Failed to transfer funds'], 500);
         }
     }
 }

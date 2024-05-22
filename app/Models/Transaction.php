@@ -15,6 +15,8 @@ class Transaction extends Model
     public const TYPE = [
         'DEPOSIT' => 'deposit',
         'WITHDRAW' => 'withdraw',
+        'TRANSFER_DEPOSIT' => 'transfer_deposit',
+        'TRANSFER_WITHDRAW' => 'transfer_withdraw'
     ];
 
     public const STATUS = [

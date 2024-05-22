@@ -35,5 +35,15 @@ class WalletSeeder extends Seeder
             'currency' => 'NGN'
         ]);
 
+        $secondUser = User::where('email', 'nancy@sample.com')->first();
+
+        Wallet::updateOrCreate([
+            'user_id' => $secondUser->id,
+            'currency' => 'NGN',
+        ],[
+            'balance' => 300,
+            'transaction_limit' => 500000
+        ]);
+
     }
 }

@@ -324,6 +324,46 @@ class WalletTest extends TestCase
         $this->assertEquals($wallet->balance, $initialBalance);
     }
 
+    /* Test funds transfer.
+    *
+    * @return void
+    */
+   public function test_funds_transfer()
+   {
+        $secondUser = User::factory()->create();
+        $initialBalance = 4000;
+        $initialBalanceSecond = 1500;
+        $amount = 1000;
+
+        $wallet = $this->user->wallets()->create([
+            'balance' => $initialBalance,
+            'currency' => 'NGN',
+        ]);
+
+        $secondWallet = $secondUser->wallets()->create([
+            'balance' =>  $initialBalanceSecond,
+            'currency' => 'NGN',
+        ]);
+
+        $response = $this->post("/api/v1/wallets/transfer-funds", [
+            "source_wallet_identifier" => $wallet->uuid,
+            "destination_wallet_identifier" => $secondWallet->uuid,
+            "amount" =>  $amount,
+            "transaction_pin" => $this->transactionPin
+        ]);
+
+        $response->assertStatus(200);
+
+        $wallet->refresh();
+        $secondWallet->refresh();
+
+        $checkAmount = $initialBalance - ($amount + $this->getFee($amount, 'NGN', 'transfer'));
+        $this->assertEquals($wallet->balance, $checkAmount);
+
+        $checkAmount = $initialBalanceSecond + ($amount - $this->getFee($amount, 'NGN', 'transfer'));
+        $this->assertEquals($secondWallet->balance, $checkAmount);
+    }
+
     /**
      * Mock Http response.
      *

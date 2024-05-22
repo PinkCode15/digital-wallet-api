@@ -14,10 +14,18 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::updateOrCreate([
+        User::updateOrCreate([
             'email' => 'admin@sample.com',
         ],[
             'name' => 'Bumpa Admin',
+            'password' => bcrypt('bumpa123'),
+            'transaction_pin' => bcrypt('514505')
+        ]);
+
+        User::updateOrCreate([
+            'email' => 'nancy@sample.com',
+        ],[
+            'name' => 'Nancy Mcguire',
             'password' => bcrypt('bumpa123'),
             'transaction_pin' => bcrypt('514505')
         ]);

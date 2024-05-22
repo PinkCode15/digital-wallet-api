@@ -45,7 +45,8 @@ class ReversalAction
 
             $data = [
                 'previous_balance' => $previousBalance,
-                'current_balance' => $wallet->balance
+                'current_balance' => $wallet->balance,
+                'currency' => $wallet->currency
             ];
     
             return $data;

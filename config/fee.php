@@ -21,4 +21,14 @@ return [
             'NGN' => env('NGN_MAX_WITHDRAW_FEE', 1000)
         ]
     ],
+
+    'transfer' => [
+        'percent' => env('PERCENT_TRANSFER_FEE', 0.5),
+        'min' => [
+            'NGN' => env('NGN_MIN_TRANSFER_FEE', 10)
+        ],
+        'max' => [
+            'NGN' => env('NGN_MAX_TRANSFER_FEE', 100)
+        ]
+    ],
 ];

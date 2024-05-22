@@ -22,10 +22,11 @@ Route::prefix('v1')->group(function () {
 
     Route::group(['prefix' => 'wallets', 'middleware' => ['auth:sanctum']], function () {
         Route::get('', [WalletController::class, 'getUserWallets']);
-        Route::get('/{walletIdentifier}', [WalletController::class, 'getWallet']);
-        Route::get('/{walletIdentifier}/transactions', [WalletController::class, 'getWalletTransactions']);
+        Route::get('/{wallet_identifier}', [WalletController::class, 'getWallet']);
+        Route::get('/{wallet_identifier}/transactions', [WalletController::class, 'getWalletTransactions']);
         Route::post('/deposit', [WalletController::class, 'initiateDeposit']);
         Route::post('/withdraw', [WalletController::class, 'initiateWithdraw']);
+        Route::post('/transfer-funds', [WalletController::class, 'transferFunds']);
     });
 
     Route::get('/transactions', [TransactionController::class, 'getUserTransactions'])->middleware(['auth:sanctum']);

@@ -15,6 +15,8 @@ class WalletHistory extends Model
         'DEPOSIT' => 'deposit',
         'WITHDRAW' => 'withdraw',
         'REVERSAL' => 'reversal',
+        'TRANSFER_DEPOSIT' => 'transfer_deposit',
+        'TRANSFER_WITHDRAW' => 'transfer_withdraw'
     ];
 
     /**
