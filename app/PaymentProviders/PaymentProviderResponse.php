@@ -1,7 +1,7 @@
 <?php
 namespace App\PaymentProviders;
 
-class PaymentProvider
+class PaymentProviderResponse
 {
    /**
     * Initialize payment 

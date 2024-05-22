@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class Paystack
+class Paystack implements PaymentProviderInterface
 {
     public $base_url;
     public $secret_key;
@@ -58,10 +58,10 @@ class Paystack
             Log::debug("Paystack Error - " . json_encode($response));
 
             $errorMessage = isset($response->message) ? $response->message : null;
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
-        return PaymentProvider::initiateDepositResponse($response->data->authorization_url, $response->data->reference);
+        return PaymentProviderResponse::initiateDepositResponse($response->data->authorization_url, $response->data->reference);
     }
 
      /**
@@ -81,7 +81,7 @@ class Paystack
                 Log::debug("Paystack Error - " . json_encode($response));
     
                 $errorMessage = isset($response->message) ? $response->message : null;
-                return PaymentProvider::errorResponse($errorMessage);
+                return PaymentProviderResponse::errorResponse($errorMessage);
             }
 
             $recipientCode = RecipientCode::create([
@@ -115,10 +115,10 @@ class Paystack
             Log::debug("Paystack Error - " . json_encode($response));
 
             $errorMessage = isset($response->message) ? $response->message : null;
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
-        return PaymentProvider::initiateWithdrawResponse($response->data->transfer_code, $response->data->amount / 100);
+        return PaymentProviderResponse::initiateWithdrawResponse($response->data->transfer_code, $response->data->amount / 100);
     }
 
 
@@ -143,10 +143,10 @@ class Paystack
             Log::debug("Paystack Error - " . json_encode($response));
             
             $errorMessage = isset($response->message) ? $response->message : null;
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
-        return PaymentProvider::verifyDepositResponse(
+        return PaymentProviderResponse::verifyDepositResponse(
             $response->data->status, $response->data->reference, $response->data->amount / 100, $response->data->currency,
             $response->data->customer->email, $response->data->metadata->wallet_identifier
         );
@@ -170,7 +170,7 @@ class Paystack
         )->object();
 
         if($response->status !== true && isset($response->code) && $response->code !== "transaction_not_found"){
-            return PaymentProvider::verifyWithdrawResponse(
+            return PaymentProviderResponse::verifyWithdrawResponse(
                 'failed', $reference
             );
         }
@@ -179,10 +179,10 @@ class Paystack
             Log::debug("Paystack Error - " . json_encode($response));
             
             $errorMessage = isset($response->message) ? $response->message : null;
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
-        return PaymentProvider::verifyWithdrawResponse(
+        return PaymentProviderResponse::verifyWithdrawResponse(
             $response->data->status, $response->data->reference, $response->data->amount, $response->data->currency
         );
     }
@@ -199,10 +199,10 @@ class Paystack
 
         if($request->header('x-paystack-signature') !== hash_hmac('sha512', $data, $this->secret_key)) {
             $errorMessage = 'Failed to validate webhook';
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
-        return PaymentProvider::validateWebhookResponse($request['data']['reference'], $request['data']['reference']);
+        return PaymentProviderResponse::validateWebhookResponse($request['data']['reference'], $request['data']['reference']);
     }
 
    /**

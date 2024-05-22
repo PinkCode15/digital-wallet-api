@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class Flutterwave
+class Flutterwave implements PaymentProviderInterface
 {
     public $base_url;
     public $secret_key;
@@ -59,10 +59,10 @@ class Flutterwave
             Log::debug("Flutterwave Error - " . json_encode($response));
 
             $errorMessage = isset($response->message) ? $response->message : null;
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
-        return PaymentProvider::initiateDepositResponse($response->data->link, $data['reference']);
+        return PaymentProviderResponse::initiateDepositResponse($response->data->link, $data['reference']);
     }
 
     /**
@@ -96,10 +96,10 @@ class Flutterwave
             Log::debug("Paystack Error - " . json_encode($response));
 
             $errorMessage = isset($response->message) ? $response->message : null;
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
-        return PaymentProvider::initiateWithdrawResponse($response->data->reference, $response->data->amount);
+        return PaymentProviderResponse::initiateWithdrawResponse($response->data->reference, $response->data->amount);
     }
 
     /**
@@ -123,10 +123,10 @@ class Flutterwave
             Log::debug("Flutterwave Error - " . json_encode($response));
             
             $errorMessage = isset($response->message) ? $response->message : null;
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
-        return PaymentProvider::verifyDepositResponse(
+        return PaymentProviderResponse::verifyDepositResponse(
             $response->data->status, $response->data->tx_ref, $response->data->amount, $response->data->currency,
             $response->data->customer->email, $response->data->meta->wallet_identifier
         );
@@ -151,7 +151,7 @@ class Flutterwave
 
 
         if($response->data->status !== "success" && $response->message == strtolower("No transaction was found for this id")){
-            return PaymentProvider::verifyWithdrawResponse(
+            return PaymentProviderResponse::verifyWithdrawResponse(
                 'failed', $reference
             );
         }
@@ -160,10 +160,10 @@ class Flutterwave
             Log::debug("Flutterwave Error - " . json_encode($response));
             
             $errorMessage = isset($response->message) ? $response->message : null;
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
-        return PaymentProvider::verifyWithdrawResponse(
+        return PaymentProviderResponse::verifyWithdrawResponse(
             $response->data->status, $response->data->tx_ref, $response->data->amount, $response->data->currency
         );
     }
@@ -180,7 +180,7 @@ class Flutterwave
 
         if($request->header('verif-hash') !== $this->secret_hash) {
             $errorMessage = 'Failed to validate webhook';
-            return PaymentProvider::errorResponse($errorMessage);
+            return PaymentProviderResponse::errorResponse($errorMessage);
         }
 
         $providerRef = isset($data['id']) ? $data['id'] : 
@@ -191,7 +191,7 @@ class Flutterwave
         (isset($data['data']['reference']) ? $data['data']['reference'] : 
         $data['transfer']['reference']);
 
-        return PaymentProvider::validateWebhookResponse($reference, $providerRef);
+        return PaymentProviderResponse::validateWebhookResponse($reference, $providerRef);
     }
 
     /**
