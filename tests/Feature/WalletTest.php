@@ -21,9 +21,7 @@ class WalletTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->artisan('migrate:fresh --env=testing');
-
+        
         $this->transactionPin = '515278';
         $this->user = User::factory()->create([
             'transaction_pin' => bcrypt($this->transactionPin)
