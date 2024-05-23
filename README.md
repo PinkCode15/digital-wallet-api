@@ -14,6 +14,7 @@ wallet balances and transactions securely.
 - Generate application key: `php artisan key:generate`
 - Update the database configuration in the .env file with your database credentials:
 - Set up the database: `php artisan migrate`
+- Run the seeders: `php artisan db:seed`
 - Run the server: `php artisan serve`
 - Explore the API documentation for endpoint details [Postman Documentation] (https://www.postman.com/subsync-domain/workspace/digital-wallet/collection/8307909-249e14b9-c3ac-4478-b87c-1de86f90c70c?action=share&creator=8307909)
 
